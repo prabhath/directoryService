@@ -124,5 +124,37 @@ router.get('/getByDepartmentAndState', function (req, res) {
     });
 });
 
+router.get('/getTransfer', function (req, res) {
+    var querySQL = queries.GET_FLAG_BY_NAME;
+
+    pool.getConnection(function (err, connection) {
+        connection.query(querySQL, ['TRANSFER'], function (err, rows) {
+            connection.release();
+            if (err) throw err;
+            console.log('Result for get transfer state', rows);
+            res.json({"ok": rows});
+        });
+    });
+});
+
+router.get('/setTransfer', function (req, res) {
+    var querySQL = queries.SET_FLAG_BY_NAME;
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
+    // var state = query.state;
+    var state = true;
+
+    pool.getConnection(function (err, connection) {
+        connection.query(querySQL, [state, 'TRANSFER'], function (err, rows) {
+            connection.release();
+            if (err) throw err;
+            console.log('Set transfer state', state);
+            res.json({"ok": rows});
+        });
+    });
+});
+
+
+
 
 module.exports = router;
