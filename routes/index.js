@@ -31,10 +31,10 @@ router.get('/getByName', function (req, res) {
     if(!utils.isUndefinedOrNull(firstName) && utils.isUndefinedOrNull(lastName)){
         querySQL= queries.GET_TP_NO_BY_FIRST_NAME;
         params.push(utils.getParamForLikeQuery(firstName));
-    }else if(utils.isUndefinedOrNull(firstName) && utils.isUndefinedOrNull(lastName)){
+    } else if (utils.isUndefinedOrNull(firstName) && !utils.isUndefinedOrNull(lastName)) {
         querySQL = queries.GET_TP_NO_BY_LAST_NAME;
         params.push(utils.getParamForLikeQuery(lastName));
-    }else if(utils.isUndefinedOrNull(firstName) && utils.isUndefinedOrNull(lastName)){
+    } else if (!utils.isUndefinedOrNull(firstName) && !utils.isUndefinedOrNull(lastName)) {
         querySQL = queries.GET_TP_NO_BY_FULL_NAME;
         params.push(utils.getParamForLikeQuery(firstName));
         params.push(utils.getParamForLikeQuery(lastName));
