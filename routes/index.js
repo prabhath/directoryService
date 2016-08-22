@@ -20,6 +20,8 @@ router.get('/', function (req, res, next) {
 
 router.get('/getByName', function (req, res) {
 
+    console.log('getByName called');
+
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
     var firstName = query.firstName;
@@ -39,6 +41,9 @@ router.get('/getByName', function (req, res) {
         params.push(utils.getParamForLikeQuery(firstName));
         params.push(utils.getParamForLikeQuery(lastName));
     }
+
+    console.log('firstName:', firstName);
+    console.log('lastName:', firstName);
 
     pool.getConnection(function(err,connection){
         connection.query(querySQL, params, function(err, rows) {
