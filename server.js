@@ -226,11 +226,8 @@ function sendResponseForSinglePersonMatch(result, sessionAttributes, callback) {
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, true));
 }
 
-function sendResponseForNoPersonMatch(caller, sessionAttributes, callback) {
+function sendResponseForNoPersonMatch(sessionAttributes, callback) {
     var speechOutPut = ' we could not find any match. Will redirect the call to operator.';
-    if (sessionAttributes.caller != undefined) {
-        speechOutPut = 'Hello ' + sessionAttributes.caller + speechOutPut;
-    }
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, true));
 }
 
@@ -296,9 +293,8 @@ function handleRequestForPersonInDepartment(intent, session, callback) {
     options.json = true;
 
     request(options, function (error, response, body) {
-        console.log(response);
         if (!error && response.statusCode == 200) {
-            if (!utils.isUndefinedOrNull(body.result)) {
+            if (body.result != null && body.result.length > 0) {
                 sendResponseForSinglePersonMatch(body.result[0], session.attributes, callback);
             } else {
                 sendResponseForNoPersonMatch(session.attributes, callback);

@@ -80,7 +80,7 @@ router.get('/getByNameAndState', function (req, res) {
 router.get('/getByNameAndDepartment', function (req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
-    var ids = query.ids.split(',');
+    var ids = query.ids.split(',').map(Number);
     var dep = query.dep;
     console.log("getByNameAndDepartment", dep, ids);
 
