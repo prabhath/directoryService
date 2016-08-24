@@ -81,16 +81,18 @@ function onIntent(intentRequest, session, callback) {
     // dispatch custom intents to handlers here
     if ("AnswerIntent" === intentName) {
         handleAnswerRequest(intent, session, callback);
-    }else if ("CompanyIntent" === intentName){
+    } else if ("CompanyIntent" === intentName) {
         handleAnswerRequest(intent, session, callback);
     } else if ("CakeSupportIntent" === intentName) {
         handleRequestForCakeSupport(intent, session, callback);
-    }else if("BuyPosIntent" === intentName){
+    } else if ("BuyPosIntent" === intentName) {
         handleRequestForBuyPOS(intent, session, callback)
     } else if ("BuyVegetablesIntent" === intentName) {
         handleRequestForBuyVegetables(intent, session, callback)
     } else if ("CityNameIntent" === intentName) {
         handleRequestForCity(intent, session, callback)
+    } else if ("DepartmentIntent" === intentName) {
+        handleRequestForDepartment(intent, session, callback);
     } else if ("NameIntent" === intentName) {
         handleRequestForNameMention(intent, session, callback)
     } else if ("PersonIntent" === intentName) {
@@ -128,7 +130,7 @@ function handleRequestForNameMention(intent, session, callback) {
 function handleUnknownIntent(intent, session, callback) {
     var speechOutput = " Sorry I cannot understand what you said , can you re phrase ?";
     var sessionAttributes = {};
-    var repromptText  = speechOutput;
+    var repromptText = speechOutput;
 
     if (session.attributes != undefined && session.attributes.previousIntentName != undefined) {
         sessionAttributes.repeatUttrence = true;
@@ -172,7 +174,7 @@ function handleRequestForCity(intent, session, callback) {
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
 }
 
-function handleRequestForBuyVegetables(intent, session, callback){
+function handleRequestForBuyVegetables(intent, session, callback) {
     var firstName = intent.slots.FirstName.value;
     var vegetableName = intent.slots.Vegetable.value;
 
@@ -186,7 +188,7 @@ function handleRequestForBuyVegetables(intent, session, callback){
     }
     sessionAttributes.previousIntentName = "vegetableIntent";
     sessionAttributes.vegetableName = vegetableName;
-    var repromptText  = speechOutput;
+    var repromptText = speechOutput;
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
 }
 
@@ -208,11 +210,37 @@ function handleRequestForBuyMeat(intent, session, callback) {
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
 }
 
+function sendResponseForMultiPersonMatch(result, sessionAttributes, callback) {
+    var speechOutPut = ' we have found multiple matches. Can we know the department ?';
+    if (sessionAttributes.caller != undefined) {
+        speechOutPut = 'Hello ' + sessionAttributes.caller + speechOutPut;
+    }
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, false));
+}
+
+function sendResponseForSinglePersonMatch(result, sessionAttributes, callback) {
+    var speechOutPut = ' Please wait while we transfer the call.';
+    if (sessionAttributes.caller != undefined) {
+        speechOutPut = 'Hello ' + sessionAttributes.caller + speechOutPut;
+    }
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, true));
+}
+
+function sendResponseForNoPersonMatch(caller, sessionAttributes, callback) {
+    var speechOutPut = ' we could not find any match. Will redirect the call to operator.';
+    if (sessionAttributes.caller != undefined) {
+        speechOutPut = 'Hello ' + sessionAttributes.caller + speechOutPut;
+    }
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, true));
+}
+
 function handleRequestForPerson(intent, session, callback) {
+
+    var caller = intent.slots.FirstName.value;
 
     console.log('Handling request for person intent');
     var firstName = intent.slots.FirstName.value;
-    var lastName = intent.slots.FirstName.value;
+    var lastName = intent.slots.LastName.value;
     console.log('Name:', firstName, lastName);
 
     var options = {};
@@ -225,15 +253,36 @@ function handleRequestForPerson(intent, session, callback) {
         options.qs["lastName"] = lastName;
     }
 
+    var sessionAttributes = {};
+    sessionAttributes.previousIntentName = "personIntent";
+    sessionAttributes.firstName = firstName;
+    sessionAttributes.lastName = lastName;
+    sessionAttributes.caller = caller;
+
     request(options, function (error, response, body) {
         // console.log(response);
         // console.log(error);
         if (!error && response.statusCode == 200) {
             // Print out the response body
+            if (body.result.length > 1) {
+                sendResponseForMultiPersonMatch(body.result, sessionAttributes, callback);
+            } else if (body.result.length == 1) {
+                sendResponseForSinglePersonMatch(body.result[0], sessionAttributes, callback);
+            } else {
+                sendResponseForNoPersonMatch(sessionAttributes, callback);
+            }
             console.log(body);
         }
     }).end();
 
+
+}
+
+function handleRequestForDepartment(intent, session, callback) {
+
+    request(options, function (error, response, body) {
+
+    });
 
 }
 
@@ -267,16 +316,16 @@ function handleAnswerRequest(intent, session, callback) {
     var sessionAttributes = {};
     var gameInProgress = session.attributes && session.attributes.questions;
 
-    if(intent.name === "CompanyIntent"){
+    if (intent.name === "CompanyIntent") {
         speechOutput = " Routing to the requested company";
-        var repromptText  = speechOutput;
+        var repromptText = speechOutput;
         sessionAttributes = {
             "speechOutput": repromptText,
             "repromptText": repromptText
         };
         callback(sessionAttributes,
             buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
-    }else {
+    } else {
 
 
     }
