@@ -40,6 +40,8 @@ router.get('/getByName', function (req, res) {
         querySQL = queries.GET_TP_NO_BY_FULL_NAME;
         params.push(utils.getParamForLikeQuery(firstName));
         params.push(utils.getParamForLikeQuery(lastName));
+    } else {
+        querySQL = queries.GET_ALL_TP_NOS;
     }
 
     console.log('firstName:', firstName);

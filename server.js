@@ -1,29 +1,14 @@
 'use strict';
-
-var questions = [
-    {
-        "Reindeer have very thick coats, how many hairs per square inch do they have?": [
-            "13,000",
-            "1,200",
-            "5,000",
-            "700",
-            "1,000",
-            "120,000"
-        ]
-    }
-];
+var http = require('http');
+var request = require('request');
+var apiHost = 'http://54.167.9.80:3000';
+var apiPort = '3000';
 
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
 exports.handler = function (event, context) {
     try {
         console.log("event.session.application.applicationId=" + event.session.application.applicationId);
-
-        /**
-         * Uncomment this if statement and populate with your skill's application ID to
-         * prevent someone else from configuring a skill that sends requests to this function.
-         */
-
         if (event.session.application.applicationId !== "amzn1.ask.skill.a154a123-c4a5-4f7e-82f3-cb6517885691") {
             context.fail("Invalid Application ID");
         }
@@ -98,14 +83,18 @@ function onIntent(intentRequest, session, callback) {
         handleAnswerRequest(intent, session, callback);
     }else if ("CompanyIntent" === intentName){
         handleAnswerRequest(intent, session, callback);
-    }else if ("CompanyIntent" === intentName){
-        handleAnswerRequest(intent, session, callback);
+    } else if ("CakeSupportIntent" === intentName) {
+        handleRequestForCakeSupport(intent, session, callback);
     }else if("BuyPosIntent" === intentName){
         handleRequestForBuyPOS(intent, session, callback)
-    }else if("CNameIntent" === intentName){
+    } else if ("BuyVegetablesIntent" === intentName) {
+        handleRequestForBuyVegetables(intent, session, callback)
+    } else if ("CityNameIntent" === intentName) {
         handleRequestForCity(intent, session, callback)
-    }else if ("AnswerOnlyIntent" === intentName) {
-        handleAnswerRequest(intent, session, callback);
+    } else if ("NameIntent" === intentName) {
+        handleRequestForNameMention(intent, session, callback)
+    } else if ("PersonIntent" === intentName) {
+        handleRequestForPerson(intent, session, callback);
     } else if ("DontKnowIntent" === intentName) {
         handleAnswerRequest(intent, session, callback);
     } else if ("AMAZON.YesIntent" === intentName) {
@@ -123,49 +112,129 @@ function onIntent(intentRequest, session, callback) {
     } else if ("AMAZON.CancelIntent" === intentName) {
         handleFinishSessionRequest(intent, session, callback);
     } else {
-        throw "Invalid intent";
+        handleUnknownIntent(intent, session, callback);
     }
 }
 
-function handleRequestForBuyPOS(intent, session, callback){
-    var speechOutput = " Please wait while we transfer the call to our cake sales team " ;
-    var sessionAttributes = {};
-    var repromptText  = speechOutput;
-
-    sessionAttributes = {
-        "speechOutput": repromptText,
-        "repromptText": repromptText,
-        "promtForCity": false
+function handleRequestForNameMention(intent, session, callback) {
+    var firstName = intent.slots.FirstName.value;
+    var speechOutput = "Hello " + firstName + " . How can we help you";
+    var sessionAttributes = {
+        firstName: firstName
     };
-    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
-
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
 }
 
-function handleRequestForCity(intent, session, callback){
-    var speechOutput = " Transferring the call to " ;
+function handleUnknownIntent(intent, session, callback) {
+    var speechOutput = " Sorry I cannot understand what you said , can you re phrase ?";
     var sessionAttributes = {};
     var repromptText  = speechOutput;
 
-    sessionAttributes = {
-        "speechOutput": repromptText,
-        "repromptText": repromptText,
-        "promtForCity": false
-    };
-    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+    if (session.attributes != undefined && session.attributes.previousIntentName != undefined) {
+        sessionAttributes.repeatUttrence = true;
+        speechOutput = " Sorry I cannot understand what you said , can you re phrase again. or shall i transfer the call to an agent?";
+    } else {
+        sessionAttributes.repeatCount = 1;
+    }
 
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+}
+
+function handleRequestForCakeSupport(intent, session, callback) {
+    var speechOutput = " Please wait while we transfer the call to our cake support team ";
+    var sessionAttributes = {};
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+}
+
+function handleRequestForBuyPOS(intent, session, callback) {
+    var speechOutput = " Please wait while we transfer the call to our cake sales team ";
+    var sessionAttributes = {};
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+}
+
+function handleRequestForCity(intent, session, callback) {
+    var speechOutput;
+    var cityName = intent.slots.CityName.value;
+    speechOutput = "Please wait while we transfer the call to the Agent Near " + cityName;
+
+    if (session.attributes != undefined && session.attributes.firstName != undefined) {
+        var firstName = session.attributes.firstName;
+        if (session.attributes.previousIntentName == "vegetableIntent") {
+            speechOutput = "Hello ! " + firstName + " , Please wait while we transfer your call to the Fresh Point Agent Near " + cityName;
+        } else if (session.attributes.previousIntentName == "meatIntent") {
+            speechOutput = "Hello ! " + firstName + " , Please wait while we transfer your call to the Specialty Meat Agent Near " + cityName;
+        }
+    }
+
+    var sessionAttributes = {
+        cityName: cityName
+    };
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
 }
 
 function handleRequestForBuyVegetables(intent, session, callback){
-    var speechOutput = " Which opco you need to connect ?";
-    var sessionAttributes = {};
-    var repromptText  = speechOutput;
+    var firstName = intent.slots.FirstName.value;
+    var vegetableName = intent.slots.Vegetable.value;
 
-    sessionAttributes = {
-        "speechOutput": repromptText,
-        "repromptText": repromptText,
-        "promtForCity": true
-    };
+    var speechOutput;
+    var sessionAttributes = {};
+    if (firstName != undefined) {
+        speechOutput = "Hello " + firstName + " , Can I know where is your restaurant is located ?";
+        sessionAttributes.firstName = firstName;
+    } else {
+        speechOutput = "Can I know where is your shop is located ?";
+    }
+    sessionAttributes.previousIntentName = "vegetableIntent";
+    sessionAttributes.vegetableName = vegetableName;
+    var repromptText  = speechOutput;
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+}
+
+function handleRequestForBuyMeat(intent, session, callback) {
+    var firstName = intent.slots.FirstName.value;
+    var meatName = intent.slots.Meat.value;
+
+    var speechOutput;
+    var sessionAttributes = {};
+    if (firstName != undefined) {
+        speechOutput = "Hello " + firstName + " , Can I know where is your restaurant is located ?";
+        sessionAttributes.firstName = firstName;
+    } else {
+        speechOutput = "Can I know where is your shop is located ?";
+    }
+    sessionAttributes.previousIntentName = "meatIntent";
+    sessionAttributes.meatName = meatName;
+    var repromptText = speechOutput;
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+}
+
+function handleRequestForPerson(intent, session, callback) {
+
+    console.log('Handling request for person intent');
+    var firstName = intent.slots.FirstName.value;
+    var lastName = intent.slots.FirstName.value;
+    console.log('Name:', firstName, lastName);
+
+    var options = {};
+    options.uri = apiHost + '/getByName';
+    options.qs = {'firstName': firstName};
+    options.method = 'GET';
+    options.json = true;
+
+    if (typeof lastName !== 'undefined') {
+        options.qs["lastName"] = lastName;
+    }
+
+    request(options, function (error, response, body) {
+        // console.log(response);
+        // console.log(error);
+        if (!error && response.statusCode == 200) {
+            // Print out the response body
+            console.log(body);
+        }
+    }).end();
+
+
 }
 
 /**
@@ -181,8 +250,6 @@ function onSessionEnded(sessionEndedRequest, session) {
 
 // ------- Skill specific business logic -------
 
-var ANSWER_COUNT = 4;
-var GAME_LENGTH = 5;
 var CARD_TITLE = "Sysco One Call"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
@@ -199,8 +266,6 @@ function handleAnswerRequest(intent, session, callback) {
     var speechOutput = "";
     var sessionAttributes = {};
     var gameInProgress = session.attributes && session.attributes.questions;
-    var answerSlotValid = isAnswerSlotValid(intent);
-    var userGaveUp = intent.name === "DontKnowIntent";
 
     if(intent.name === "CompanyIntent"){
         speechOutput = " Routing to the requested company";
@@ -248,15 +313,7 @@ function handleFinishSessionRequest(intent, session, callback) {
         buildSpeechletResponseWithoutCard("Good bye!", "", true));
 }
 
-function isAnswerSlotValid(intent) {
-    var answerSlotFilled = intent.slots && intent.slots.Answer && intent.slots.Answer.value;
-    var answerSlotIsInt = answerSlotFilled && !isNaN(parseInt(intent.slots.Answer.value));
-    return answerSlotIsInt && parseInt(intent.slots.Answer.value) < (ANSWER_COUNT + 1) && parseInt(intent.slots.Answer.value) > 0;
-}
-
 // ------- Helper functions to build responses -------
-
-
 function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
     return {
         outputSpeech: {
