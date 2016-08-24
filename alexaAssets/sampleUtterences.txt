@@ -1,0 +1,40 @@
+BuyPosIntent How can I buy a {POS}
+BuyPosIntent How can I purchase a {POS}
+BuyPosIntent I need to buy a {POS}
+
+CakeSupportIntent My {CakeProduct} is not working properly
+CakeSupportIntent Our {CakeProduct} is not working
+CakeSupportIntent Our {CakeProduct} is not loading properly
+
+BuyVegetablesIntent I want to buy {Vegetable}
+BuyVegetablesIntent Hello I'm {FirstName} I need to buy some {Vegetable} to my restaurant
+BuyVegetablesIntent Hello I'm {FirstName} I need to buy some {Vegetable}
+BuyVegetablesIntent Hello I'm {FirstName} and I need to buy some {Vegetable}
+BuyVegetablesIntent Hey I'm {FirstName} and I need to buy some {Vegetable}
+
+BuyMeatIntent I want to buy {Meat}
+BuyMeatIntent Hello I'm {FirstName} I need to buy some {Meat} to my restaurant
+
+PersonIntent I want to talk to {FirstName} {LastName}
+PersonIntent I want to contact {FirstName} {LastName}
+PersonIntent Get me {FirstName} {LastName}
+
+CityNameIntent We are located near {CityName}
+
+AMAZON.StartOverIntent start game
+AMAZON.StartOverIntent new game
+AMAZON.StartOverIntent start
+AMAZON.StartOverIntent start new call
+
+DontKnowIntent i don't know
+
+NameIntent Hey I'm {FirstName}
+NameIntent It's {FirstName} speaking
+NameIntent Hey It's {FirstName} speaking
+
+MessageIntent {arriving|Message} using LITERAL
+MessageIntent {I am coming|Message} using LITERAL
+MessageIntent {I am on my way|Message} using LITERAL
+MessageIntent {I am coming home|Message} using LITERAL
+MessageIntent {call me when you get a chance|Message} using LITERAL
+MessageIntent {welcome to alexa and twilio messenger|Message} using LITERAL

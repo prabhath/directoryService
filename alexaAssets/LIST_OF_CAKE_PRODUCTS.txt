@@ -1,0 +1,4 @@
+pos
+point of sales
+guest manager
+cake reports

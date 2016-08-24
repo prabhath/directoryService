@@ -1,0 +1,100 @@
+{
+  "intents": [
+    {
+      "intent": "NameIntent",
+      "slots": [
+        {
+          "name": "FirstName",
+          "type": "AMAZON.US_FIRST_NAME"
+        }
+      ]
+
+    },
+    {
+      "intent": "BuyPosIntent",
+      "slots": [
+        {
+          "name": "POS",
+          "type": "LIST_OF_POS_UTTERENCES"
+        }
+      ]
+    },
+    {
+      "intent": "CakeSupportIntent",
+      "slots": [
+        {
+          "name": "CakeProduct",
+          "type": "LIST_OF_CAKE_PRODUCTS"
+        }
+      ]
+    },
+    {
+      "intent": "BuyVegetablesIntent",
+      "slots": [
+        {
+          "name": "Vegetable",
+          "type": "LIST_OF_VEGETABLES"
+        },
+        {
+          "name": "FirstName",
+          "type": "AMAZON.US_FIRST_NAME"
+        }
+      ]
+    },
+    {
+      "intent": "BuyMeatIntent",
+      "slots": [
+        {
+          "name": "Meat",
+          "type": "LIST_OF_MEAT"
+        },
+        {
+          "name": "FirstName",
+          "type": "AMAZON.US_FIRST_NAME"
+        }
+      ]
+    },
+    {
+      "intent": "CityNameIntent",
+      "slots": [
+        {
+          "name": "CityName",
+          "type": "AMAZON.US_CITY"
+        }
+      ]
+    },
+    {
+      "intent": "DontKnowIntent"
+    },
+    {
+      "intent": "AMAZON.StartOverIntent"
+    },
+    {
+      "intent": "AMAZON.RepeatIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.YesIntent"
+    },
+    {
+      "intent": "AMAZON.NoIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    },
+    {
+      "intent": "MessageIntent",
+      "slots": [
+        {
+          "name" : "Message",
+          "type": "AMAZON.LITERAL"
+        }
+      ]
+    }
+  ]
+}
