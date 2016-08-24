@@ -1,0 +1,36 @@
+groceries
+Artichokes
+Asparagus
+Broccoli
+Carrots
+Cauliflower
+Celery
+Cherries
+Grapes
+Peaches
+Radishes
+Apples
+Apricots
+Blueberries
+Cabbage
+Corn
+Iceberg
+Kiwi
+Leaf Lettuce
+Mushrooms
+Strawberries
+Cantaloupe
+Green Beans
+Honeydew
+Lemons
+Limes
+Melons
+Oranges
+Avocados
+Cucumbers
+Eggplant
+Peppers
+Pineapple
+Red Potatoes
+Squash
+Zucchini
