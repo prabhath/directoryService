@@ -91,8 +91,8 @@ function onIntent(intentRequest, session, callback) {
         handleRequestForBuyVegetables(intent, session, callback)
     } else if ("CityNameIntent" === intentName) {
         handleRequestForCity(intent, session, callback)
-    } else if ("DepartmentIntent" === intentName) {
-        handleRequestForDepartment(intent, session, callback);
+    } else if ("PersonInDepartmentIntent" === intentName) {
+        handleRequestForPersonInDepartment(intent, session, callback);
     } else if ("NameIntent" === intentName) {
         handleRequestForNameMention(intent, session, callback)
     } else if ("PersonIntent" === intentName) {
@@ -263,8 +263,13 @@ function handleRequestForPerson(intent, session, callback) {
         // console.log(response);
         // console.log(error);
         if (!error && response.statusCode == 200) {
-            // Print out the response body
             if (body.result.length > 1) {
+                // Print out the response body
+                var ids = body.result[0].ID;
+                for (var i = 0; i < body.result.length; i++) {
+                    ids += ',' + body.result[i].ID
+                }
+                sessionAttributes.ids = ids;
                 sendResponseForMultiPersonMatch(body.result, sessionAttributes, callback);
             } else if (body.result.length == 1) {
                 sendResponseForSinglePersonMatch(body.result[0], sessionAttributes, callback);
@@ -278,18 +283,29 @@ function handleRequestForPerson(intent, session, callback) {
 
 }
 
-function handleRequestForDepartment(intent, session, callback) {
-
+function handleRequestForPersonInDepartment(intent, session, callback) {
+    console.log('Handling request for person in department');
     var options = {};
     options.uri = apiHost + '/getByNameAndDepartment';
-    options.qs = {'firstName': firstName};
+    options.qs = {
+        'firstName': session.attributes.firstName,
+        'lastName': session.attributes.lastName,
+        'dep': intent.slots.DEPARTMENT.value
+    };
+    console.log('data:', options.qs);
     options.method = 'GET';
     options.json = true;
 
     request(options, function (error, response, body) {
-
+        console.log(response);
+        if (!error && response.statusCode == 200) {
+            if (!utils.isUndefinedOrNull(body.result)) {
+                sendResponseForSinglePersonMatch(body.result[0], session.attributes, callback);
+            } else {
+                sendResponseForNoPersonMatch(session.attributes, callback);
+            }
+        }
     });
-
 }
 
 /**

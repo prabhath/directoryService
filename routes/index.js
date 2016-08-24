@@ -82,8 +82,9 @@ router.get('/getByNameAndDepartment', function (req, res) {
     var query = url_parts.query;
     var ids = query.ids.split(',');
     var dep = query.dep;
+    console.log("getByNameAndDepartment", dep, ids);
 
-    var querySQL = queries.GET_TP_NO_BY_STATE;
+    var querySQL = queries.GET_TP_NO_BY_DEPARTMENT;
 
     pool.getConnection(function (err, connection) {
         connection.query(querySQL, [dep, ids], function (err, rows) {
