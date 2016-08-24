@@ -280,6 +280,12 @@ function handleRequestForPerson(intent, session, callback) {
 
 function handleRequestForDepartment(intent, session, callback) {
 
+    var options = {};
+    options.uri = apiHost + '/getByNameAndDepartment';
+    options.qs = {'firstName': firstName};
+    options.method = 'GET';
+    options.json = true;
+
     request(options, function (error, response, body) {
 
     });
