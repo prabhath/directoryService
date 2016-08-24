@@ -52,7 +52,7 @@ router.get('/getByName', function (req, res) {
             connection.release();
             if (err) throw err;
             console.log('Result for get by name', params, rows);
-            res.json({"ok": rows});
+            res.json({"result": rows});
         });
     });
 
@@ -71,7 +71,7 @@ router.get('/getByNameAndState', function (req, res) {
             connection.release();
             if (err) throw err;
             console.log('Result for get by state and name', [state, ids], rows);
-            res.json({"ok": rows});
+            res.json({"result": rows});
         });
     });
 
@@ -90,7 +90,7 @@ router.get('/getByNameAndDepartment', function (req, res) {
             connection.release();
             if (err) throw err;
             console.log('Result for get by department and name', [state, ids], rows);
-            res.json({"ok": rows});
+            res.json({"result": rows});
         });
     });
 });
@@ -108,7 +108,7 @@ router.get('/getByDepartment', function (req, res) {
             connection.release();
             if (err) throw err;
             console.log('Result for get by department', [dep], rows);
-            res.json({"ok": rows});
+            res.json({"result": rows});
         });
     });
 });
@@ -126,7 +126,7 @@ router.get('/getByDepartmentAndState', function (req, res) {
             connection.release();
             if (err) throw err;
             console.log('Result for get by department and state', [dep, state], rows);
-            res.json({"ok": rows});
+            res.json({"result": rows});
         });
     });
 });
@@ -142,9 +142,9 @@ router.get('/getTransfer', function (req, res) {
             if (rows.length > 0) {
                 var temp = rows[0];
                 temp.message = "This is a test message";
-                res.json({"ok": temp});
+                res.json({"result": temp});
             } else {
-                res.json({"ok": null});
+                res.json({"result": null});
             }
         });
     });
@@ -161,7 +161,7 @@ router.get('/setTransfer', function (req, res) {
             connection.release();
             if (err) throw err;
             console.log('Set transfer state', state);
-            res.json({"ok": rows});
+            res.json({"result": rows});
         });
     });
 });
