@@ -266,7 +266,7 @@ function handleRequestForPerson(intent, session, callback) {
             if (body.result.length > 1) {
                 // Print out the response body
                 var ids = body.result[0].ID;
-                for (var i = 0; i < body.result.length; i++) {
+                for (var i = 1; i < body.result.length; i++) {
                     ids += ',' + body.result[i].ID
                 }
                 sessionAttributes.ids = ids;
@@ -288,8 +288,7 @@ function handleRequestForPersonInDepartment(intent, session, callback) {
     var options = {};
     options.uri = apiHost + '/getByNameAndDepartment';
     options.qs = {
-        'firstName': session.attributes.firstName,
-        'lastName': session.attributes.lastName,
+        'ids': session.attributes.ids,
         'dep': intent.slots.DEPARTMENT.value
     };
     console.log('data:', options.qs);

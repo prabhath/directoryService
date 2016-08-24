@@ -90,7 +90,7 @@ router.get('/getByNameAndDepartment', function (req, res) {
         connection.query(querySQL, [dep, ids], function (err, rows) {
             connection.release();
             if (err) throw err;
-            console.log('Result for get by department and name', [state, ids], rows);
+            console.log('Result for get by department and name', [dep, ids], rows);
             res.json({"result": rows});
         });
     });
