@@ -158,7 +158,7 @@ router.get('/setTransfer', function (req, res) {
     var state = Boolean(query.state);
 
     pool.getConnection(function (err, connection) {
-        connection.query(querySQL, [state, 'TRANSFER'], function (err, rows) {
+        connection.query(querySQL, [state, query, 'TRANSFER'], function (err, rows) {
             connection.release();
             if (err) throw err;
             console.log('Set transfer state', state);
