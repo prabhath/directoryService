@@ -4,6 +4,9 @@ var request = require('request');
 var apiHost = 'http://54.167.9.80:3000';
 var apiPort = '3000';
 
+
+var OPERATOR_FORWARDING_MESSAGE = 'we could not find any match. Will redirect the call to operator.'
+
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
 exports.handler = function (event, context) {
@@ -159,19 +162,32 @@ function handleRequestForCity(intent, session, callback) {
     var cityName = intent.slots.CityName.value;
     speechOutput = "Please wait while we transfer the call to the Agent Near " + cityName;
 
+    var intentId = null;
+    var cityId = null;
+    var slotValue = null;
+    var slotID = null;
+
     if (session.attributes != undefined && session.attributes.firstName != undefined) {
         var firstName = session.attributes.firstName;
         if (session.attributes.previousIntentName == "vegetableIntent") {
             speechOutput = "Hello ! " + firstName + " , Please wait while we transfer your call to the Fresh Point Agent Near " + cityName;
+            slotValue = 'vegetables';
+            slotID = config.vegetables[sessionAttributes.requestSlotValue];
         } else if (session.attributes.previousIntentName == "meatIntent") {
             speechOutput = "Hello ! " + firstName + " , Please wait while we transfer your call to the Specialty Meat Agent Near " + cityName;
+            slotID = config.vegetables[sessionAttributes.requestSlotValue];
         }
+        intentId = config.intent["session.attributes.previousIntentName"];
+        cityId = config.city[cityName];
     }
 
     var sessionAttributes = {
         cityName: cityName
     };
-    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+
+    console.log('City intend received', intentId, cityId, slotValue, slotID);
+
+    getLearntData(intentId, cityId, slotValue, slotID, sessionAttributes, callback, speechOutput);
 }
 
 function handleRequestForBuyVegetables(intent, session, callback) {
@@ -188,6 +204,7 @@ function handleRequestForBuyVegetables(intent, session, callback) {
     }
     sessionAttributes.previousIntentName = "vegetableIntent";
     sessionAttributes.vegetableName = vegetableName;
+    sessionAttributes.requestSlotValue = vegetableName;
     var repromptText = speechOutput;
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
 }
@@ -206,6 +223,8 @@ function handleRequestForBuyMeat(intent, session, callback) {
     }
     sessionAttributes.previousIntentName = "meatIntent";
     sessionAttributes.meatName = meatName;
+    sessionAttributes.requestSlotValue = vegetableName;
+
     var repromptText = speechOutput;
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
 }
@@ -227,12 +246,11 @@ function sendResponseForSinglePersonMatch(result, sessionAttributes, callback) {
 }
 
 function sendResponseForNoPersonMatch(sessionAttributes, callback) {
-    var speechOutPut = ' we could not find any match. Will redirect the call to operator.';
+    var speechOutPut = OPERATOR_FORWARDING_MESSAGE;
     callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, true));
 }
 
 function handleRequestForPerson(intent, session, callback) {
-
     var caller = intent.slots.FirstName.value;
 
     console.log('Handling request for person intent');
@@ -272,12 +290,11 @@ function handleRequestForPerson(intent, session, callback) {
                 sendResponseForSinglePersonMatch(body.result[0], sessionAttributes, callback);
             } else {
                 sendResponseForNoPersonMatch(sessionAttributes, callback);
+                redirectToOperator();
             }
             console.log(body);
         }
     }).end();
-
-
 }
 
 function handleRequestForPersonInDepartment(intent, session, callback) {
@@ -296,8 +313,10 @@ function handleRequestForPersonInDepartment(intent, session, callback) {
         if (!error && response.statusCode == 200) {
             if (body.result != null && body.result.length > 0) {
                 sendResponseForSinglePersonMatch(body.result[0], session.attributes, callback);
+                redirect(body.result[0]);
             } else {
                 sendResponseForNoPersonMatch(session.attributes, callback);
+                redirectToOperator();
             }
         }
     });
@@ -423,4 +442,61 @@ function buildResponse(sessionAttributes, speechletResponse) {
         sessionAttributes: sessionAttributes,
         response: speechletResponse
     };
+}
+
+function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttributes, callback, speechOutput) {
+    var requestJson = {};
+    requestJson.INTENTION = intentCode;
+    requestJson.CITY = cityCode;
+    requestJson[slotType] = slotCode;
+
+    var options = {};
+    options.uri = apiHost + '/predict';
+    options.qs = {'firstName': firstName};
+    options.method = 'GET';
+    options.json = true;
+
+    console.log('Loading learnt data');
+
+    request(options, function (error, response, body) {
+        console.log(error);
+        console.log(body);
+        if (!error && response.statusCode == 200) {
+            redirect(body.PREDICTION);
+        } else {
+            speechOutput = OPERATOR_FORWARDING_MESSAGE;
+            redirectToOperator();
+        }
+        callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+    }).end();
+}
+
+
+function redirect(number, name) {
+    console.log('Redirected to:', number, name);
+}
+
+function redirectToOperator() {
+    console.log('Redirect to human operator');
+}
+
+var config = {
+    city: {
+        NY: 1,
+        CA: 2
+    },
+    intent: {
+        vegetableIntent: 1,
+        meatIntent: 2,
+        tableIntent: 3
+    },
+    vegetables: {
+        Tomato: 1,
+        Garlic: 2,
+        Potato: 3
+    },
+    meat: {
+        chicken: 1,
+        beef: 2
+    }
 }
