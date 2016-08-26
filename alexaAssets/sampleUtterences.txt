@@ -11,6 +11,9 @@ BuyVegetablesIntent Hello I'm {FirstName} I need to buy some {Vegetable} to my r
 BuyVegetablesIntent Hello I'm {FirstName} I need to buy some {Vegetable}
 BuyVegetablesIntent Hello I'm {FirstName} and I need to buy some {Vegetable}
 BuyVegetablesIntent Hey I'm {FirstName} and I need to buy some {Vegetable}
+BuyVegetablesIntent Hey I am {FirstName} and I need to buy some {Vegetable}
+BuyVegetablesIntent Hey im {FirstName} and I need to buy some {Vegetable}
+BuyVegetablesIntent Hello im {FirstName} and I need to buy some {Vegetable}
 
 BuyMeatIntent I want to buy {Meat}
 BuyMeatIntent Hello I'm {FirstName} I need to buy some {Meat} to my restaurant
@@ -32,9 +35,11 @@ NameIntent Hey I'm {FirstName}
 NameIntent It's {FirstName} speaking
 NameIntent Hey It's {FirstName} speaking
 
+PersonInDepartmentIntent {DEPARTMENT} department
+PersonInDepartmentIntent department is {DEPARTMENT}
+
 MessageIntent {arriving|Message} using LITERAL
 MessageIntent {I am coming|Message} using LITERAL
 MessageIntent {I am on my way|Message} using LITERAL
 MessageIntent {I am coming home|Message} using LITERAL
 MessageIntent {call me when you get a chance|Message} using LITERAL
-MessageIntent {welcome to alexa and twilio messenger|Message} using LITERAL

@@ -219,7 +219,7 @@ function sendResponseForMultiPersonMatch(result, sessionAttributes, callback) {
 }
 
 function sendResponseForSinglePersonMatch(result, sessionAttributes, callback) {
-    var speechOutPut = ' Please wait while we transfer the call.';
+    var speechOutPut = ' Please wait while we transfer the call to ' + sessionAttributes.firstName;
     if (sessionAttributes.caller != undefined) {
         speechOutPut = 'Hello ' + sessionAttributes.caller + speechOutPut;
     }
@@ -233,7 +233,7 @@ function sendResponseForNoPersonMatch(sessionAttributes, callback) {
 
 function handleRequestForPerson(intent, session, callback) {
 
-    var caller = intent.slots.FirstName.value;
+    var caller = intent.slots.CallerName.value;
 
     console.log('Handling request for person intent');
     var firstName = intent.slots.FirstName.value;
