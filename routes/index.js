@@ -156,6 +156,7 @@ router.get('/setTransfer', function (req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
     var state = Boolean(query.state);
+    query = query.query;
 
     pool.getConnection(function (err, connection) {
         connection.query(querySQL, [state, query, 'TRANSFER'], function (err, rows) {

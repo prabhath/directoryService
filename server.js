@@ -2,6 +2,7 @@
 var http = require('http');
 var request = require('request');
 var apiHost = 'http://54.167.9.80:3000';
+var dataApiHost = 'http://54.167.9.80:8080';
 var apiPort = '3000';
 
 
@@ -452,9 +453,12 @@ function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttribut
     requestJson[slotType] = slotCode;
 
     var options = {};
-    options.uri = apiHost + '/predict';
-    options.qs = {'firstName': firstName};
-    options.method = 'GET';
+    options.uri = dataApiHost + '/predict';
+    options.multipart = {
+        chunked: false,
+        data: [requestJson]
+    }
+    options.method = 'POST';
     options.json = true;
 
     console.log('Loading learnt data');
