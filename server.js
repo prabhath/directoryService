@@ -93,6 +93,8 @@ function onIntent(intentRequest, session, callback) {
         handleRequestForBuyPOS(intent, session, callback)
     } else if ("BuyVegetablesIntent" === intentName) {
         handleRequestForBuyVegetables(intent, session, callback)
+    } else if ("BuyVegetablesIntent" === intentName) {
+        handleRequestForBuyMeat(intent, session, callback)
     } else if ("CityNameIntent" === intentName) {
         handleRequestForCity(intent, session, callback)
     } else if ("PersonInDepartmentIntent" === intentName) {
@@ -163,24 +165,24 @@ function handleRequestForCity(intent, session, callback) {
     var cityName = intent.slots.CityName.value;
     speechOutput = "Please wait while we transfer the call to the Agent Near " + cityName;
 
-    var intentId = null;
-    var cityId = null;
     var slotValue = null;
     var slotID = null;
 
-    if (session.attributes != undefined && session.attributes.firstName != undefined) {
-        var firstName = session.attributes.firstName;
-        if (session.attributes.previousIntentName == "vegetableIntent") {
-            speechOutput = "Hello ! " + firstName + " , Please wait while we transfer your call to the Fresh Point Agent Near " + cityName;
-            slotValue = 'vegetables';
-            slotID = config.vegetables[sessionAttributes.requestSlotValue];
-        } else if (session.attributes.previousIntentName == "meatIntent") {
-            speechOutput = "Hello ! " + firstName + " , Please wait while we transfer your call to the Specialty Meat Agent Near " + cityName;
-            slotID = config.vegetables[sessionAttributes.requestSlotValue];
-        }
-        intentId = config.intent["session.attributes.previousIntentName"];
-        cityId = config.city[cityName];
+    var firstName = session.attributes.firstName;
+    if (session.attributes.previousIntentName == "vegetableIntent") {
+        speechOutput = " , Please wait while we transfer your call to the Fresh Point Agent Near " + cityName;
+        slotValue = 'vegetables';
+        slotID = config.vegetables[session.attributes.requestSlotValue];
+    } else if (session.attributes.previousIntentName == "meatIntent") {
+        speechOutput = " , Please wait while we transfer your call to the Specialty Meat Agent Near " + cityName;
+        slotID = config.vegetables[session.attributes.requestSlotValue];
     }
+    if (firstName != undefined) {
+        speechOutput = "Hello ! " + firstName + speechOutput;
+    }
+    var intentId = config.intent[session.attributes.previousIntentName];
+    var cityId = config.city[cityName.replace(/ /g, '')];
+
 
     var sessionAttributes = {
         cityName: cityName
@@ -454,12 +456,12 @@ function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttribut
 
     var options = {};
     options.uri = dataApiHost + '/predict';
-    options.multipart = {
-        chunked: false,
-        data: [requestJson]
-    }
-    options.method = 'POST';
     options.json = true;
+    options.method = 'POST';
+    options.headers = {
+        'Content-Type': 'application/json'
+    };
+    options.body = requestJson;
 
     console.log('Loading learnt data');
 
@@ -473,7 +475,7 @@ function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttribut
             redirectToOperator();
         }
         callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
-    }).end();
+    });
 }
 
 
@@ -487,7 +489,7 @@ function redirectToOperator() {
 
 var config = {
     city: {
-        NY: 1,
+        NewYork: 1,
         CA: 2
     },
     intent: {
@@ -496,12 +498,16 @@ var config = {
         tableIntent: 3
     },
     vegetables: {
-        Tomato: 1,
-        Garlic: 2,
-        Potato: 3
+        tomato: 1,
+        garlic: 2,
+        potato: 3,
+        vegetables: 4,
+        fruits: 5
     },
     meat: {
         chicken: 1,
-        beef: 2
+        beef: 2,
+        meat: 3,
+        fish: 4
     }
 }
