@@ -319,19 +319,21 @@ function handleRequestForPersonInDepartment(intent, session, callback) {
     options.method = 'GET';
     options.json = true;
 
-    var speechOutPut = ' Please wait while we transfer the call to ' + session.attributes.firstName;
-
-    request(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            if (body.result != null && body.result.length > 0) {
-                sendResponseForSinglePersonMatch(body.result[0], session.attributes, callback);
-                redirect(body.result[0]);
-            } else {
-                sendResponseForNoPersonMatch(session.attributes, callback);
-                redirectToOperator();
-            }
-        }
-    });
+    var sessionAttributes = {};
+    var speechOutPut = ' Please wait while we transfer the call to ' + session.attributes.firstName + " from the "
+        + intent.slots.DEPARTMENT.value + " department";
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutPut, speechOutPut, true));
+    //request(options, function (error, response, body) {
+    //    if (!error && response.statusCode == 200) {
+    //        if (body.result != null && body.result.length > 0) {
+    //            sendResponseForSinglePersonMatch(body.result[0], session.attributes, callback);
+    //            redirect(body.result[0]);
+    //        } else {
+    //            sendResponseForNoPersonMatch(session.attributes, callback);
+    //            redirectToOperator();
+    //        }
+    //    }
+    //});
 }
 
 /**
