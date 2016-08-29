@@ -154,13 +154,13 @@ function handleUnknownIntent(intent, session, callback) {
 function handleRequestForCakeSupport(intent, session, callback) {
     var speechOutput = " Please wait while we transfer the call to our cake support team ";
     var sessionAttributes = {};
-    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, true));
 }
 
 function handleRequestForBuyPOS(intent, session, callback) {
     var speechOutput = " Please wait while we transfer the call to our cake sales team ";
     var sessionAttributes = {};
-    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, true));
 }
 
 function handleRequestForCity(intent, session, callback) {
@@ -176,6 +176,8 @@ function handleRequestForCity(intent, session, callback) {
         speechOutput = " , Please wait while we transfer your call to the Fresh Point Agent Near " + cityName;
         slotValue = 'vegetables';
         slotID = config.vegetables[session.attributes.requestSlotValue];
+        // TODO set to learn
+
     } else if (session.attributes.previousIntentName == "meatIntent") {
         speechOutput = " , Please wait while we transfer your call to the Specialty Meat Agent Near " + cityName;
         slotID = config.vegetables[session.attributes.requestSlotValue];
@@ -296,7 +298,8 @@ function handleRequestForPerson(intent, session, callback) {
             } else if (body.result.length == 1) {
                 sendResponseForSinglePersonMatch(body.result[0], sessionAttributes, callback);
             } else {
-                sendResponseForNoPersonMatch(sessionAttributes, callback);
+                sendResponseForMultiPersonMatch(body.result, sessionAttributes, callback);
+                //sendResponseForNoPersonMatch(sessionAttributes, callback);
                 redirectToOperator();
             }
             console.log(body);
@@ -315,6 +318,8 @@ function handleRequestForPersonInDepartment(intent, session, callback) {
     console.log('data:', options.qs);
     options.method = 'GET';
     options.json = true;
+
+    var speechOutPut = ' Please wait while we transfer the call to ' + session.attributes.firstName;
 
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -451,6 +456,10 @@ function buildResponse(sessionAttributes, speechletResponse) {
     };
 }
 
+function setLearn() {
+
+}
+
 function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttributes, callback, speechOutput) {
     var requestJson = {};
     requestJson.INTENTION = intentCode;
@@ -477,7 +486,7 @@ function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttribut
             speechOutput = OPERATOR_FORWARDING_MESSAGE;
             redirectToOperator();
         }
-        callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+        callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, true));
     });
 }
 
@@ -540,8 +549,35 @@ function redirect(number, name) {
     console.log('Redirected to:', number, name);
 }
 
-function redirectToOperator() {
+function redirectToOperator(utterence) {
     console.log('Redirect to human operator');
+    //var requestJson = {};
+    //requestJson.INTENTION = intentCode;
+    //requestJson.CITY = cityCode;
+    //requestJson[slotType] = slotCode;
+    //
+    //var options = {};
+    //options.uri = dataApiHost + '/predict';
+    //options.json = true;
+    //options.method = 'POST';
+    //options.headers = {
+    //    'Content-Type': 'application/json'
+    //};
+    //options.body = requestJson;
+    //
+    //console.log('Loading learnt data');
+    //
+    //request(options, function (error, response, body) {
+    //    console.log(error);
+    //    console.log(body);
+    //    if (!error && response.statusCode == 200) {
+    //        redirect(body.PREDICTION);
+    //    } else {
+    //        speechOutput = OPERATOR_FORWARDING_MESSAGE;
+    //        redirectToOperator();
+    //    }
+    //    callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, true));
+    //});
 }
 
 var config = {
