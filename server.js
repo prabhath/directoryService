@@ -511,37 +511,45 @@ function handleNewIntent(intent, session, callback) {
         console.log(error);
         console.log(body);
         var speechOutput;
+        var saveData = false;
         if (!error && response.statusCode == 200) {
             if (body.status == "Not Found") {
                 speechOutput = "Sorry we could not find a match. Please wait while we transfer your call to the operator";
-                saveStatus(true, requestJson.input);
             } else {
+                saveData = true;
                 speechOutput = "Please wait while we transfer your call to supplies on the fly."
             }
         } else {
             speechOutput = OPERATOR_FORWARDING_MESSAGE;
             redirectToOperator();
         }
-        callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+        saveStatus(saveData, true, requestJson.input, callback, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, true));
+
     });
 
 }
 
 
-function saveStatus(status, message) {
-    console.log("saving status in database");
-    var options = {};
-    options.uri = apiHost + '/setTransfer';
-    options.qs = {'state': status, "query": message};
-    options.method = 'GET';
-    options.json = true;
+function saveStatus(saveData, status, message, callback, speechResponse) {
+    if (!saveData) {
+        callback({}, speechResponse);
+    } else {
+        console.log("saving status in database");
+        var options = {};
+        options.uri = apiHost + '/setTransfer';
+        options.qs = {'state': status, "query": message};
+        options.method = 'GET';
+        options.json = true;
 
-    console.log(status, message);
+        console.log(status, message);
 
-    request(options, function (error, response, body) {
-        console.log(error);
-        console.log(body);
-    });
+        request(options, function (error, response, body) {
+            console.log(error);
+            console.log(response);
+            console.log(body);
+            callback({}, speechResponse);
+        });
+    }
 }
 
 
