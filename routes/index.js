@@ -142,7 +142,7 @@ router.get('/getTransfer', function (req, res) {
             console.log('Result for get transfer state', rows);
             if (rows.length > 0) {
                 var temp = rows[0];
-                temp.message = "This is a test message";
+                temp.message = rows[0].TEXT;
                 res.json({"result": temp});
             } else {
                 res.json({"result": null});
