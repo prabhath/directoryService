@@ -353,7 +353,7 @@ var CARD_TITLE = "Sysco One Call"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
     var sessionAttributes = {},
-        speechOutput = " Welcome to Sysco , How may we help you ?";
+        speechOutput = " Welcome to Sysco , How can we help you ?";
     var repromptText = speechOutput;
     var shouldEndSession = false;
 
@@ -399,7 +399,7 @@ function handleGetHelpRequest(intent, session, callback) {
     // Set a flag to track that we're in the Help state.
     session.attributes.userPromptedToContinue = true;
 
-    var speechOutput = " Welcome to Sysco , How may we help you ?";
+    var speechOutput = " Welcome to Sysco , How can we help you ?";
     var repromptText = "Please repharase so question, or shall I transfer the call to the customer service operator";
     var shouldEndSession = false;
     callback(session.attributes,
