@@ -3,6 +3,7 @@ var http = require('http');
 var request = require('request');
 var apiHost = 'http://54.167.9.80:3000';
 var dataApiHost = 'http://54.167.9.80:8080';
+var wordClassifierHost = "http://54.167.9.80:9090"
 var apiPort = '3000';
 
 
@@ -105,6 +106,8 @@ function onIntent(intentRequest, session, callback) {
         handleRequestForPerson(intent, session, callback);
     } else if ("DontKnowIntent" === intentName) {
         handleAnswerRequest(intent, session, callback);
+    } else if ("NewIntent" === intentName) {
+        handleNewIntent(intent, session, callback);
     } else if ("AMAZON.YesIntent" === intentName) {
         handleAnswerRequest(intent, session, callback);
     } else if ("AMAZON.NoIntent" === intentName) {
@@ -475,6 +478,60 @@ function getLearntData(intentCode, cityCode, slotType, slotCode, sessionAttribut
             redirectToOperator();
         }
         callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+    });
+}
+
+function handleNewIntent(intent, session, callback) {
+
+    console.log('Handle new intent called');
+    var requestJson = {};
+    requestJson.input = "I want to purchase an oven for my new restaurant";
+
+    var options = {};
+    options.uri = dataApiHost + '/WordClassifier/rest/posidentifier/posClassifier';
+    options.json = true;
+    options.method = 'POST';
+    options.headers = {
+        'Content-Type': 'application/json'
+    };
+    options.body = requestJson;
+
+    console.log('Loading response from part of speech.');
+
+    request(options, function (error, response, body) {
+        console.log(error);
+        console.log(body);
+        var speechOutput;
+        if (!error && response.statusCode == 200) {
+            if (body.status == "Not Found") {
+                speechOutput = "Sorry we could not find a match. Please wait while we transfer your call to the operator";
+                saveStatus(true, requestJson.input);
+            } else {
+                speechOutput = "Please wait while we transfer your call to supplies on the fly."
+            }
+        } else {
+            speechOutput = OPERATOR_FORWARDING_MESSAGE;
+            redirectToOperator();
+        }
+        callback(sessionAttributes, buildSpeechletResponse(CARD_TITLE, speechOutput, speechOutput, false));
+    });
+
+}
+
+
+function saveStatus(status, message) {
+    console.log("saving status in database");
+    var options = {};
+    options.uri = apiHost + '/setTransfer';
+    options.qs = {'state': status, "query": message};
+    options.method = 'GET';
+    options.json = true;
+
+    console.log(status, message);
+
+    request(options, function (error, response, body) {
+        console.log(error);
+        console.log(body);
     });
 }
 
