@@ -497,7 +497,7 @@ function handleNewIntent(intent, session, callback) {
     requestJson.input = "I want to purchase an oven for my new restaurant";
 
     var options = {};
-    options.uri = dataApiHost + '/WordClassifier/rest/posidentifier/posClassifier';
+    options.uri = wordClassifierHost + '/WordClassifier/rest/posidentifier/posClassifier';
     options.json = true;
     options.method = 'POST';
     options.headers = {
