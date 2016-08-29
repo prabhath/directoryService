@@ -514,9 +514,9 @@ function handleNewIntent(intent, session, callback) {
         var saveData = false;
         if (!error && response.statusCode == 200) {
             if (body.status == "Not Found") {
+                saveData = true;
                 speechOutput = "Sorry we could not find a match. Please wait while we transfer your call to the operator";
             } else {
-                saveData = true;
                 speechOutput = "Please wait while we transfer your call to supplies on the fly."
             }
         } else {
